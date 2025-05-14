@@ -29,13 +29,17 @@ app.post('/submit-form', async (req, res) => {
         `;
 
         // Send to Telegram
-        await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        const response = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
             chat_id: TELEGRAM_CHAT_ID,
             text: telegramMessage,
             parse_mode: 'HTML'
         });
 
-        res.json({ success: true, message: 'Form submitted successfully!' });
+        if (response.data.ok) {
+            res.json({ success: true, message: 'Form submitted successfully!' });
+        } else {
+            throw new Error('Failed to send Telegram message');
+        }
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ success: false, message: 'Error submitting form' });
