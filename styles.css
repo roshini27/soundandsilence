@@ -426,10 +426,6 @@ footer {
         width: 100%;
         box-sizing: border-box;
         word-break: break-word;
-        margin-bottom: 1rem;
-    }
-    .info-item.location:last-child {
-        margin-bottom: 0;
     }
     .location-details p {
         font-size: 1rem;
