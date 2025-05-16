@@ -420,10 +420,18 @@ footer {
         padding: 0 1rem;
     }
 
+    .footer-content .locations-container {
+        flex-direction: column !important;
+        gap: 0.8rem;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .footer-content .info-item.location {
+        width: 100%;
+        max-width: 100%;
+    }
     .info-item.location {
         min-width: 0;
-        max-width: 100%;
-        width: 100%;
         box-sizing: border-box;
         word-break: break-word;
     }
@@ -434,13 +442,6 @@ footer {
     }
     .footer-logo {
         font-size: 1.8rem;
-    }
-
-    .locations-container {
-        flex-direction: column;
-        gap: 0.8rem;
-        align-items: flex-start;
-        width: 100%;
     }
 }
 
