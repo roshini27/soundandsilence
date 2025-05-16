@@ -10,7 +10,7 @@ app.use(express.static('.'));
 
 // Telegram configuration
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = '9000380017'; // Your Telegram chat ID
+const TELEGRAM_CHAT_ID = '1197255819'; // Your Telegram chat ID
 
 // Handle form submission
 app.post('/submit-form', async (req, res) => {
