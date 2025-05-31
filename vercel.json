@@ -28,12 +28,8 @@
       "dest": "/server.js"
     },
     {
-      "src": "/sitemap.xml",
-      "dest": "/public/sitemap.xml"
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "/public/robots.txt"
+      "src": "/(.*\.(css|js|png|jpg|jpeg|gif|svg|ico|xml|txt))",
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",
