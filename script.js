@@ -150,4 +150,4 @@ fetch('https://analytics.soundandsilence.in/sendevent', {
 })
 .then(res => res.json())
 .then(data => console.log('Analytics response:', data))
-.catch(err => console.error('Analytics error:', err)); 
+.catch(err => console.error('Analytics error:', err));
