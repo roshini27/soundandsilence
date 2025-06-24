@@ -1,39 +1,15 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "styles.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "script.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/**/*",
-      "use": "@vercel/static"
-    }
+    { "src": "server.js", "use": "@vercel/node" },
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "styles.css", "use": "@vercel/static" },
+    { "src": "script.js", "use": "@vercel/static" },
+    { "src": "public/**/*", "use": "@vercel/static" }
   ],
   "routes": [
-    {
-      "src": "/submit-form",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/(.*\.(css|js|png|jpg|jpeg|gif|svg|ico|xml|txt))",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+    { "src": "/submit-form", "dest": "/server.js" },
+    { "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico|xml|txt))", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
-} 
+}
