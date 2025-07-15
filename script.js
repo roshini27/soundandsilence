@@ -1,5 +1,18 @@
 // Website Analytics Event Sending
 
+// Helper: Get accurate UTC timestamp from the internet
+async function getAccurateUTCTimestamp() {
+    try {
+        const response = await fetch('https://www.timeapi.io/api/Time/current/zone?timeZone=UTC');
+        const data = await response.json();
+        return data.dateTime; // e.g., "2024-06-07T12:34:56.789Z"
+    } catch (err) {
+        // Fallback to device time if API fails
+        console.error('Failed to fetch internet time, using device time.', err);
+        return new Date().toISOString();
+    }
+}
+
 // Generate a random userId for the session
 function generateRandomUserId() {
     return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
@@ -14,12 +27,13 @@ if (!analyticsUserId) {
 
 // Smooth scrolling for navigation links and analytics for nav clicks
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
+    anchor.addEventListener('click', async function (e) {
         e.preventDefault();
         document.querySelector(this.getAttribute('href')).scrollIntoView({
             behavior: 'smooth'
         });
         // --- Analytics: Send click event ---
+        const timestamp = await getAccurateUTCTimestamp();
         fetch('https://analytics.soundandsilence.in/sendevent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -27,7 +41,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 eventName: 'navClick',
                 userId: analyticsUserId,
                 link: this.getAttribute('href'),
-                timestamp: new Date().toISOString()
+                timestamp: timestamp
             })
         }).catch(err => console.error('Analytics error:', err));
     });
@@ -35,7 +49,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Navbar background change on scroll and analytics for scroll event
 let scrollEventSent = false;
-window.addEventListener('scroll', function() {
+window.addEventListener('scroll', async function() {
     const navbar = document.querySelector('.navbar');
     if (window.scrollY > 50) {
         navbar.style.background = 'rgba(255, 255, 255, 0.95)';
@@ -47,6 +61,7 @@ window.addEventListener('scroll', function() {
     // --- Analytics: Send scroll event once per session ---
     if (!scrollEventSent && window.scrollY > 50) {
         scrollEventSent = true;
+        const timestamp = await getAccurateUTCTimestamp();
         fetch('https://analytics.soundandsilence.in/sendevent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -54,7 +69,7 @@ window.addEventListener('scroll', function() {
                 eventName: 'scrolledPast50px',
                 userId: analyticsUserId,
                 scrollY: window.scrollY,
-                timestamp: new Date().toISOString()
+                timestamp: timestamp
             })
         }).catch(err => console.error('Analytics error:', err));
     }
@@ -97,13 +112,14 @@ if (contactForm) {
             }
 
             // --- Analytics: Send form submission event ---
+            const timestamp = await getAccurateUTCTimestamp();
             fetch('https://analytics.soundandsilence.in/sendevent', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     eventName: 'formSubmit',
                     userId: analyticsUserId,
-                    timestamp: new Date().toISOString()
+                    timestamp: timestamp
                 })
             }).catch(err => console.error('Analytics error:', err));
 
@@ -139,15 +155,17 @@ document.querySelectorAll('.service-card').forEach(card => {
 });
 
 // --- Analytics: Send page view event on page load ---
-fetch('https://analytics.soundandsilence.in/sendevent', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        eventName: 'pageView',
-        userId: analyticsUserId,
-        timestamp: new Date().toISOString()
+getAccurateUTCTimestamp().then(timestamp => {
+    fetch('https://analytics.soundandsilence.in/sendevent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            eventName: 'pageView',
+            userId: analyticsUserId,
+            timestamp: timestamp
+        })
     })
-})
-.then(res => res.json())
-.then(data => console.log('Analytics response:', data))
-.catch(err => console.error('Analytics error:', err));
+    .then(res => res.json())
+    .then(data => console.log('Analytics response:', data))
+    .catch(err => console.error('Analytics error:', err));
+}); 
