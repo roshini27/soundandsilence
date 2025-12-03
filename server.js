@@ -26,6 +26,15 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static('.'));
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        message: 'Server is running',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Telegram configuration
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = '1197255819'; // Your Telegram chat ID
