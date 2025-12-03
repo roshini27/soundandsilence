@@ -1,8 +1,18 @@
 const express = require('express');
 const axios = require('axios');
+const fs = require('fs');
 require('dotenv').config();
 
 const app = express();
+
+// Error handling middleware - must be first
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
 // Manual CORS middleware - ensures headers are always set
 app.use((req, res, next) => {
@@ -23,8 +33,21 @@ app.use((req, res, next) => {
     next();
 });
 
+// Body parser middleware
 app.use(express.json());
-app.use(express.static('.'));
+app.use(express.urlencoded({ extended: true }));
+
+// Static files (only if public directory exists, otherwise skip)
+try {
+    if (fs.existsSync('./public')) {
+        app.use(express.static('public'));
+    } else if (fs.existsSync('.')) {
+        // Fallback: serve current directory if no public folder
+        app.use(express.static('.'));
+    }
+} catch (error) {
+    console.log('Static file serving skipped:', error.message);
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -97,8 +120,33 @@ app.post('/submit-form', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`CORS enabled for soundandsilence.in domains`);
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        status: 'error',
+        message: err.message || 'Internal server error'
+    });
 });
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({
+        status: 'error',
+        message: 'Endpoint not found'
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+
+// Start server with error handling
+try {
+    app.listen(PORT, () => {
+        console.log(`✅ Server running on port ${PORT}`);
+        console.log(`✅ CORS enabled for all origins`);
+        console.log(`✅ Health check: http://localhost:${PORT}/health`);
+    });
+} catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+}
