@@ -5,17 +5,12 @@ require('dotenv').config();
 
 const app = express();
 
-// CORS Configuration - Allow requests from your Vercel domain
+// CORS Configuration - Allow all origins (for testing/development)
+// Note: Using '*' with credentials: true is not allowed by browsers
+// If you need credentials, use specific origins instead
 app.use(cors({
-    origin: [
-        'https://soundandsilence-git-main-roshini27s-projects.vercel.app',
-        /^https:\/\/.*\.vercel\.app$/,  // Allow all Vercel subdomains
-        'http://localhost:3000',
-        'http://localhost:8080',
-        'http://127.0.0.1:3000',
-        'http://127.0.0.1:8080'
-    ],
-    credentials: true,
+    origin: true,  // Allow all origins (equivalent to '*')
+    credentials: false,  // Must be false when allowing all origins
     methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     exposedHeaders: ['*'],
@@ -94,5 +89,5 @@ app.options('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`CORS enabled for Vercel domains`);
+    console.log(`CORS enabled for soundandsilence.in domains`);
 });
