@@ -164,5 +164,43 @@
     </footer>
 
     <script src="script.js"></script>
+    
+    <!-- Cookie Sync Implementation - Simple TOI Style -->
+    <script>
+    (function() {
+        'use strict';
+        
+        // Configuration - Change this to your Google Network ID
+        const GOOGLE_NETWORK_ID = '168-628-5891';
+        const googlePixelUrl = 'https://cm.g.doubleclick.net/pixel?google_nid=' + GOOGLE_NETWORK_ID + '&google_cm';
+        
+        // Simple pixel loading - same as TOI approach
+        function loadCookieSyncPixel() {
+            const pixel = new Image();
+            pixel.onload = function() {
+                // Pixel loaded successfully - Google sets IDE cookie on doubleclick.net domain
+            };
+            pixel.onerror = function() {
+                // Pixel failed to load (might be blocked by ad blocker)
+            };
+            pixel.src = googlePixelUrl;
+        }
+        
+        // Load pixel when page loads (simple approach like TOI)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadCookieSyncPixel);
+        } else {
+            loadCookieSyncPixel();
+        }
+        
+        // Also expose for manual testing
+        window.testCookieSync = function() {
+            loadCookieSyncPixel();
+            console.log('Cookie sync pixel loaded. Check Network tab for request to:', googlePixelUrl);
+            console.log('Check Application tab → Cookies → doubleclick.net for IDE cookie');
+        };
+    })();
+    </script>
 </body>
-</html> 
+</html>
+
