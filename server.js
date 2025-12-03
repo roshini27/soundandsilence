@@ -8,6 +8,16 @@ const app = express();
 // CORS Configuration - Allow all origins (for testing/development)
 // Note: Using '*' with credentials: true is not allowed by browsers
 // If you need credentials, use specific origins instead
+
+// Handle OPTIONS preflight requests FIRST (before CORS middleware)
+app.options('*', (req, res) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Max-Age', '3600');
+    res.sendStatus(200);
+});
+
 app.use(cors({
     origin: true,  // Allow all origins (equivalent to '*')
     credentials: false,  // Must be false when allowing all origins
@@ -26,6 +36,11 @@ const TELEGRAM_CHAT_ID = '1197255819'; // Your Telegram chat ID
 
 // Analytics endpoint - /sendevent (for your script.js)
 app.post('/sendevent', async (req, res) => {
+    // Set CORS headers explicitly
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    
     try {
         const eventData = req.body;
         
@@ -81,10 +96,8 @@ app.post('/submit-form', async (req, res) => {
     }
 });
 
-// Handle OPTIONS preflight requests explicitly
-app.options('*', (req, res) => {
-    res.sendStatus(200);
-});
+// Additional OPTIONS handler (backup - CORS middleware should handle it)
+// This ensures OPTIONS requests are always handled
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
