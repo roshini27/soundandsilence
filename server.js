@@ -4,13 +4,53 @@ const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+
+// CORS Configuration - Allow requests from your Vercel domain
+app.use(cors({
+    origin: [
+        'https://soundandsilence-git-main-roshini27s-projects.vercel.app',
+        /^https:\/\/.*\.vercel\.app$/,  // Allow all Vercel subdomains
+        'http://localhost:3000',
+        'http://localhost:8080',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:8080'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['*'],
+    maxAge: 3600  // Cache preflight requests for 1 hour
+}));
+
 app.use(express.json());
 app.use(express.static('.'));
 
 // Telegram configuration
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = '1197255819'; // Your Telegram chat ID
+
+// Analytics endpoint - /sendevent (for your script.js)
+app.post('/sendevent', async (req, res) => {
+    try {
+        const eventData = req.body;
+        
+        // Process your analytics event here
+        console.log('Analytics event received:', eventData);
+        
+        // Return success response
+        res.json({
+            status: 'success',
+            message: 'Event received',
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error processing analytics event:', error);
+        res.status(500).json({
+            status: 'error',
+            message: error.message
+        });
+    }
+});
 
 // Handle form submission
 app.post('/submit-form', async (req, res) => {
@@ -46,7 +86,13 @@ app.post('/submit-form', async (req, res) => {
     }
 });
 
+// Handle OPTIONS preflight requests explicitly
+app.options('*', (req, res) => {
+    res.sendStatus(200);
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-}); 
+    console.log(`CORS enabled for Vercel domains`);
+});
