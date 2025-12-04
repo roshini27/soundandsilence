@@ -1,22 +1,16 @@
 // Website Analytics Event Sending
 
-// Helper: Get accurate UTC timestamp from the internet (Fixed - uses reliable API)
+// Helper: Get accurate UTC timestamp from the internet
 async function getAccurateUTCTimestamp() {
     try {
-        // Try WorldTimeAPI (more reliable than timeapi.io)
-        const response = await fetch('https://worldtimeapi.org/api/timezone/UTC', {
-            signal: AbortSignal.timeout(3000) // 3 second timeout
-        });
-        if (response.ok) {
-            const data = await response.json();
-            return data.datetime; // e.g., "2024-06-07T12:34:56.789Z"
-        }
+        const response = await fetch('https://www.timeapi.io/api/Time/current/zone?timeZone=UTC');
+        const data = await response.json();
+        return data.dateTime; // e.g., "2024-06-07T12:34:56.789Z"
     } catch (err) {
         // Fallback to device time if API fails
-        console.log('Failed to fetch internet time, using device time.');
+        console.error('Failed to fetch internet time, using device time.', err);
+        return new Date().toISOString();
     }
-    // Always return device time as fallback
-    return new Date().toISOString();
 }
 
 // Generate a random userId for the session
@@ -35,12 +29,9 @@ if (!analyticsUserId) {
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', async function (e) {
         e.preventDefault();
-        const targetElement = document.querySelector(this.getAttribute('href'));
-        if (targetElement) {
-            targetElement.scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
         // --- Analytics: Send click event ---
         const timestamp = await getAccurateUTCTimestamp();
         fetch('https://analytics.soundandsilence.in/sendevent', {
@@ -177,4 +168,4 @@ getAccurateUTCTimestamp().then(timestamp => {
     .then(res => res.json())
     .then(data => console.log('Analytics response:', data))
     .catch(err => console.error('Analytics error:', err));
-});
+}); 
